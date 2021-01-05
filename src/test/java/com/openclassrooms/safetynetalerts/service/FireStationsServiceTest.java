@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
+import com.openclassrooms.safetynetalerts.models.PersonsModel;
 import com.openclassrooms.safetynetalerts.services.impl.FireStationsServiceImpl;
 
 @SpringBootTest
@@ -47,5 +48,24 @@ public class FireStationsServiceTest {
 	// THEN
 	assertEquals(expectedLastStationAddress, fireStation.getAddress());
 	assertEquals(expectedLastStationNumber, fireStation.getStation());
+    }
+    
+    @Test
+    @DisplayName("Test que la liste des personnes couvertes par une station valide ne renvoie pas null")
+    public void getPersonsListCoveredByStation() throws IOException {
+	//GIVEN
+	PersonsModel person = new PersonsModel();
+	
+	//WHEN 
+	person = fireStationsServiceImpl.findByStationNumber(1).get(0);
+	
+	//THEN
+	assertNotNull(person.getFirstName());
+	assertNotNull(person.getLastName());
+	assertNotNull(person.getAddress());
+	assertNotNull(person.getCity());
+	assertNotNull(person.getZip());
+	assertNotNull(person.getPhone());
+	assertNotNull(person.getEmail());
     }
 }
