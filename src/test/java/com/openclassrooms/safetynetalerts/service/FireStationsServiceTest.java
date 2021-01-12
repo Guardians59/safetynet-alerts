@@ -2,16 +2,15 @@ package com.openclassrooms.safetynetalerts.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.io.IOException;
-
+import java.text.ParseException;
+import java.util.HashMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
-import com.openclassrooms.safetynetalerts.models.PersonsModel;
 import com.openclassrooms.safetynetalerts.services.impl.FireStationsServiceImpl;
 
 @SpringBootTest
@@ -51,21 +50,53 @@ public class FireStationsServiceTest {
     }
     
     @Test
-    @DisplayName("Test que la liste des personnes couvertes par une station valide ne renvoie pas null")
-    public void getPersonsListCoveredByStation() throws IOException {
+    @DisplayName("Test que la recherche par numéro de station ne renvoit pas null")
+    public void getPersonsListFindByStationNumberIsNotNullTest() throws IOException, ParseException {
 	//GIVEN
-	PersonsModel person = new PersonsModel();
+	HashMap<String, Object> liste = new HashMap<>();
+	boolean expected = true;
 	
-	//WHEN 
-	person = fireStationsServiceImpl.findByStationNumber(1).get(0);
+	//WHEN
+	liste = fireStationsServiceImpl.findPersonsByStationNumber(1);
 	
 	//THEN
-	assertNotNull(person.getFirstName());
-	assertNotNull(person.getLastName());
-	assertNotNull(person.getAddress());
-	assertNotNull(person.getCity());
-	assertNotNull(person.getZip());
-	assertNotNull(person.getPhone());
-	assertNotNull(person.getEmail());
+	assertEquals(liste.containsKey("Persons Major"), expected);
+	assertEquals(liste.containsKey("Persons Minor"), expected);
+	
     }
-}
+    
+    @Test
+    @DisplayName("Test que la station 4 ne contient que des personnes majeures")
+    public void getListStationNumber4Test() throws IOException, ParseException {
+	//GIVEN
+	HashMap<String, Object> liste = new HashMap<>();
+	boolean expectedMajor = true;
+	boolean expectedMinor = false;
+	
+	//WHEN
+	liste = fireStationsServiceImpl.findPersonsByStationNumber(4);
+	
+	//THEN	
+	assertEquals(liste.containsKey("Persons Minor"), expectedMinor);
+	assertEquals(liste.containsKey("Persons Major"), expectedMajor);
+		
+	    }
+    
+    @Test
+    @DisplayName("Test que la liste est vide quand le numéro de station est incorrect")
+    public void getListWrongStationNumberTest() throws IOException, ParseException {
+	//GIVEN
+	HashMap<String, Object> liste = new HashMap<>();
+	boolean expected = false;
+	
+	
+	//WHEN
+	liste = fireStationsServiceImpl.findPersonsByStationNumber(5);
+	
+	//THEN	
+	assertEquals(liste.containsKey("Persons Minor"), expected);
+	assertEquals(liste.containsKey("Persons Major"), expected);
+    }
+    }
+   
+

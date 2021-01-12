@@ -1,8 +1,12 @@
 package com.openclassrooms.safetynetalerts.services.impl;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -11,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
+import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
 import com.openclassrooms.safetynetalerts.models.PersonsModel;
 import com.openclassrooms.safetynetalerts.repository.FireStationsRepository;
+import com.openclassrooms.safetynetalerts.repository.MedicalRecordsRepository;
 import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
 import com.openclassrooms.safetynetalerts.services.IFireStationsService;
 
@@ -23,8 +29,13 @@ public class FireStationsServiceImpl implements IFireStationsService {
     FireStationsRepository fireStationsRepository;
     @Autowired
     PersonsRepository personsRepository;
+    @Autowired
+    MedicalRecordsRepository medicalRecordsRepository;
 
     private static final Logger logger = LogManager.getLogger("FireStationsServieImpl");
+    private int numberOfStationsFound;
+    private int numberOfMajorPerson;
+    private int numberOfMinorPerson;
 
     @Override
     public List<FireStationsModel> findAll() throws IOException {
@@ -33,37 +44,85 @@ public class FireStationsServiceImpl implements IFireStationsService {
     }
 
     @Override
-    public ArrayList<PersonsModel> findByStationNumber(int station) throws IOException {
+    public HashMap<String, Object> findPersonsByStationNumber(int station) throws IOException, ParseException {
 
-	ArrayList<PersonsModel> result = new ArrayList<>();
-	List<FireStationsModel> listStations = fireStationsRepository.findAll();
-	List<PersonsModel> listPersons = personsRepository.findAll();
+	HashMap<String, Object> result = new HashMap<>();
+	ArrayList<PersonsModel> listPersons = new ArrayList<>();
+	ArrayList<PersonsModel> listPersonsMinor = new ArrayList<>();
+	ArrayList<PersonsModel> listPersonsMajor = new ArrayList<>();
+	List<FireStationsModel> listStationsModel = fireStationsRepository.findAll();
+	List<PersonsModel> listPersonsModel = personsRepository.findAll();
+	List<MedicalRecordsModel> listMedicalModel = medicalRecordsRepository.findAll();
 	int key = station;
-	int numberOfStationsFound = 0;
+	Date dateNow = new Date();
+	numberOfMajorPerson = 0;
+	numberOfMinorPerson = 0;
+	numberOfStationsFound = 0;
 
 	logger.info("Search for people covered by the station number " + key);
-	listStations.forEach(fireStation -> {
-	    
+	listStationsModel.forEach(fireStation -> {
 	    if (fireStation.getStation() == key) {
-		numberOfStationsFound ++;
-		listPersons.forEach(person -> {
-		    if (person.getAddress().equals(fireStation.getAddress()) && !result.contains(person)) {
-			result.add(person);
+		numberOfStationsFound++;
+
+		listPersonsModel.forEach(person -> {
+
+		    if (person.getAddress().equals(fireStation.getAddress()) && !listPersons.contains(person)) {
+
+			listPersons.add(person);
+
+			listMedicalModel.forEach(birthDate -> {
+
+			    if (birthDate.getFirstName().equals(person.getFirstName())
+				    && birthDate.getLastName().equals(person.getLastName())) {
+
+				DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+				Date birthDatePerson;
+				try {
+
+				    birthDatePerson = format.parse(birthDate.getBirthdate());
+
+				    if ((dateNow.getTime() - birthDatePerson.getTime()) / 31557600000.0 > 18) {
+					numberOfMajorPerson++;
+					listPersonsMajor.add(person);
+				    } else {
+					numberOfMinorPerson++;
+					listPersonsMinor.add(person);
+				    }
+				} catch (ParseException e) {
+				    e.printStackTrace();
+				}
+
+			    }
+			});
 
 		    }
-
 		});
-
 	    }
-	    
 	});
+
 	if (numberOfStationsFound == 0) {
 	    logger.error("There is no station corresponding to the number " + key);
-	} else if (result.isEmpty()) {
+	} else if (listPersons.isEmpty() && numberOfStationsFound != 0) {
 	    logger.info("There is no person in the coverage area of ​​station number " + key);
-	} 
+	}
+
+	if (!listPersonsMajor.isEmpty()) {
+	    result.put("Persons Major", listPersonsMajor);
+
+	} else if (listPersonsMajor.isEmpty() && numberOfStationsFound != 0) {
+	    logger.info("There is no major person in the coverage area of ​​station number " + key);
+	}
+	if (!listPersonsMinor.isEmpty()) {
+	    result.put("Persons Minor", listPersonsMinor);
+
+	} else if (listPersonsMinor.isEmpty() && numberOfStationsFound != 0) {
+	    logger.info("There is no minor person in the coverage area of ​​station number " + key);
+	}
+	if (numberOfStationsFound != 0) {
+	    result.put("Number of major person", numberOfMajorPerson);
+	    result.put("Number of minor person", numberOfMinorPerson);
+	}
 	return result;
 
     }
-
 }
