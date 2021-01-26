@@ -8,9 +8,9 @@ import java.util.List;
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
 
 public interface IFireStationsService {
-    
+
     public List<FireStationsModel> findAll() throws IOException;
-    
+
     public HashMap<String, Object> findPersonsByStationNumber(int station) throws IOException, ParseException;
-    
+
 }

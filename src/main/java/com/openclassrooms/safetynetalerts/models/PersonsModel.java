@@ -1,5 +1,8 @@
 package com.openclassrooms.safetynetalerts.models;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
+@JsonFilter("URL station number")
 public class PersonsModel {
 
     private String firstName;

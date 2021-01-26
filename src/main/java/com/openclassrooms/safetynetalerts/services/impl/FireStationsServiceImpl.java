@@ -75,13 +75,13 @@ public class FireStationsServiceImpl implements IFireStationsService {
 			    if (birthDate.getFirstName().equals(person.getFirstName())
 				    && birthDate.getLastName().equals(person.getLastName())) {
 
-				DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+				DateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 				Date birthDatePerson;
 				try {
 
 				    birthDatePerson = format.parse(birthDate.getBirthdate());
 
-				    if ((dateNow.getTime() - birthDatePerson.getTime()) / 31557600000.0 > 18) {
+				    if ((dateNow.getTime() - birthDatePerson.getTime()) / 31557600000.0 >= 19) {
 					numberOfMajorPerson++;
 					listPersonsMajor.add(person);
 				    } else {
@@ -107,22 +107,23 @@ public class FireStationsServiceImpl implements IFireStationsService {
 	}
 
 	if (!listPersonsMajor.isEmpty()) {
-	    result.put("Persons Major", listPersonsMajor);
+	    result.put("personsMajor", listPersonsMajor);
 
 	} else if (listPersonsMajor.isEmpty() && numberOfStationsFound != 0) {
 	    logger.info("There is no major person in the coverage area of ​​station number " + key);
 	}
 	if (!listPersonsMinor.isEmpty()) {
-	    result.put("Persons Minor", listPersonsMinor);
+	    result.put("personsMinor", listPersonsMinor);
 
 	} else if (listPersonsMinor.isEmpty() && numberOfStationsFound != 0) {
 	    logger.info("There is no minor person in the coverage area of ​​station number " + key);
 	}
 	if (numberOfStationsFound != 0) {
-	    result.put("Number of major person", numberOfMajorPerson);
-	    result.put("Number of minor person", numberOfMinorPerson);
+	    result.put("numberOfMajorPerson", numberOfMajorPerson);
+	    result.put("numberOfMinorPerson", numberOfMinorPerson);
 	}
 	return result;
 
     }
+
 }

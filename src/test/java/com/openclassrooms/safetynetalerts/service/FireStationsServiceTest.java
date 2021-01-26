@@ -60,8 +60,8 @@ public class FireStationsServiceTest {
 	liste = fireStationsServiceImpl.findPersonsByStationNumber(1);
 	
 	//THEN
-	assertEquals(liste.containsKey("Persons Major"), expected);
-	assertEquals(liste.containsKey("Persons Minor"), expected);
+	assertEquals(liste.containsKey("personsMajor"), expected);
+	assertEquals(liste.containsKey("personsMinor"), expected);
 	
     }
     
@@ -77,8 +77,8 @@ public class FireStationsServiceTest {
 	liste = fireStationsServiceImpl.findPersonsByStationNumber(4);
 	
 	//THEN	
-	assertEquals(liste.containsKey("Persons Minor"), expectedMinor);
-	assertEquals(liste.containsKey("Persons Major"), expectedMajor);
+	assertEquals(liste.containsKey("personsMinor"), expectedMinor);
+	assertEquals(liste.containsKey("personsMajor"), expectedMajor);
 		
 	    }
     
@@ -94,8 +94,8 @@ public class FireStationsServiceTest {
 	liste = fireStationsServiceImpl.findPersonsByStationNumber(5);
 	
 	//THEN	
-	assertEquals(liste.containsKey("Persons Minor"), expected);
-	assertEquals(liste.containsKey("Persons Major"), expected);
+	assertEquals(liste.containsKey("personsMinor"), expected);
+	assertEquals(liste.containsKey("personsMajor"), expected);
     }
     }
    
