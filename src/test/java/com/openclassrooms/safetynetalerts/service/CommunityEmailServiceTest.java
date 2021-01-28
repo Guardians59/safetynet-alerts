@@ -1,47 +1,47 @@
 package com.openclassrooms.safetynetalerts.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.io.IOException;
-
+import java.util.HashMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.openclassrooms.safetynetalerts.services.impl.PersonsServiceImpl;
+import com.openclassrooms.safetynetalerts.services.impl.CommunityEmailServiceImpl;
 
 @SpringBootTest
-public class CommunityEmailTest {
+public class CommunityEmailServiceTest {
 
     @Autowired
-    PersonsServiceImpl personsServiceImpl;
+    CommunityEmailServiceImpl communityEmailServiceImpl;
 
     @Test
-    @DisplayName("Test que la liste n'est pas null")
+    @DisplayName("Test que l'on obtient un résultat avec une ville valide")
     public void getPersonsMailInTheCityTest() throws IOException {
 	// GIVEN
-	String email;
+	HashMap<String, Object> result = new HashMap<>();
+	boolean expected = true;
 
 	// WHEN
-	email = personsServiceImpl.findEmail("Culver").get(0);
-
+	result = communityEmailServiceImpl.findEmail("Culver");
+	
 	// THEN
-	assertNotNull(email);
+	assertEquals(result.containsKey("email"), expected);
     }
 
     @Test
-    @DisplayName("Test que tous les Emails soient bien présent")
-    public void verifySizeListEmailTest() throws IOException {
+    @DisplayName("Test que l'on obtient pas de résultat avec une ville invalide")
+    public void getErrorPersonsMailWithInvalidCityTest() throws IOException {
 	// GIVEN
-	int numberEmail;
+	HashMap<String, Object> result = new HashMap<>();
+	boolean expected = false;
 
 	// WHEN
-	numberEmail = personsServiceImpl.findEmail("Culver").size();
+	result = communityEmailServiceImpl.findEmail("Culve");
 
 	// THEN
-	assertEquals(numberEmail, 23);
+	assertEquals(result.containsKey("email"), expected);
     }
 
 }
