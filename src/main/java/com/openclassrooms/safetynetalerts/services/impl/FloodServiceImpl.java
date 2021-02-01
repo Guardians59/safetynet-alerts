@@ -20,22 +20,14 @@ import com.openclassrooms.safetynetalerts.models.FloodPersonModel;
 import com.openclassrooms.safetynetalerts.models.FloodStationModel;
 import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
 import com.openclassrooms.safetynetalerts.models.PersonsModel;
-import com.openclassrooms.safetynetalerts.repository.FireStationsRepository;
-import com.openclassrooms.safetynetalerts.repository.MedicalRecordsRepository;
-import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
+import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IFloodService;
 
 @Repository
 public class FloodServiceImpl implements IFloodService {
 
     @Autowired
-    PersonsRepository personsRepository;
-
-    @Autowired
-    MedicalRecordsRepository medicalRecordsRepository;
-
-    @Autowired
-    FireStationsRepository fireStationsRepository;
+    DBRepository repository;
 
     private static final Logger logger = LogManager.getLogger("FloodServiceIpml");
     private int key;
@@ -48,9 +40,9 @@ public class FloodServiceImpl implements IFloodService {
 
 	HashMap<String, Object> result = new HashMap<>();
 	ArrayList<FloodStationModel> listFloodStationModel = new ArrayList<>();
-	List<FireStationsModel> listStationsModel = fireStationsRepository.findAll();
-	List<PersonsModel> listPersonsModel = personsRepository.findAll();
-	List<MedicalRecordsModel> listMedicalRecordsModel = medicalRecordsRepository.findAll();
+	List<FireStationsModel> listStationsModel = repository.getFireStations();
+	List<PersonsModel> listPersonsModel = repository.getPersons();
+	List<MedicalRecordsModel> listMedicalRecordsModel = repository.getMedicalRecords();
 
 	key = 0;
 	stationFound = false;

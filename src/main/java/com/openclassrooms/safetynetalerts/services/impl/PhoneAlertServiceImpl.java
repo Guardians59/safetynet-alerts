@@ -12,17 +12,14 @@ import org.springframework.stereotype.Repository;
 
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
 import com.openclassrooms.safetynetalerts.models.PersonsModel;
-import com.openclassrooms.safetynetalerts.repository.FireStationsRepository;
-import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
+import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IPhoneAlertService;
 
 @Repository
 public class PhoneAlertServiceImpl implements IPhoneAlertService {
     
     @Autowired
-    PersonsRepository personsRepository;
-    @Autowired
-    FireStationsRepository fireStationsRepository;
+    DBRepository repository;
     
     private static final Logger logger = LogManager.getLogger("PhoneAlertServieImpl");
     private int numberOfStationsFound;
@@ -33,8 +30,8 @@ public class PhoneAlertServiceImpl implements IPhoneAlertService {
 	HashMap<String, Object> result = new HashMap<>();
 	ArrayList<String> listPhone = new ArrayList<>();
 	ArrayList<PersonsModel> listPersons = new ArrayList<>();
-	List<FireStationsModel> listStationsModel = fireStationsRepository.findAll();
-	List<PersonsModel> listPersonsModel = personsRepository.findAll();
+	List<FireStationsModel> listStationsModel = repository.getFireStations();
+	List<PersonsModel> listPersonsModel = repository.getPersons();
 	int key = station;
 	numberOfStationsFound = 0;
 

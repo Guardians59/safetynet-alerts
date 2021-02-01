@@ -17,18 +17,14 @@ import org.springframework.stereotype.Repository;
 import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
 import com.openclassrooms.safetynetalerts.models.PersonInfoModel;
 import com.openclassrooms.safetynetalerts.models.PersonsModel;
-import com.openclassrooms.safetynetalerts.repository.MedicalRecordsRepository;
-import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
+import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IPersonInfoService;
 
 @Repository
 public class PersonInfoServiceImpl implements IPersonInfoService {
 
     @Autowired
-    PersonsRepository personsRepository;
-
-    @Autowired
-    MedicalRecordsRepository medicalRecordsRepository;
+    DBRepository repository;
 
     private static final Logger logger = LogManager.getLogger("PersonInfoServiceIpml");
 
@@ -38,8 +34,8 @@ public class PersonInfoServiceImpl implements IPersonInfoService {
 
 	HashMap<String, Object> result = new HashMap<>();
 	ArrayList<PersonInfoModel> listPersons = new ArrayList<>();
-	List<PersonsModel> listPersonsModel = personsRepository.findAll();
-	List<MedicalRecordsModel> listMedicalRecordsModel = medicalRecordsRepository.findAll();
+	List<PersonsModel> listPersonsModel = repository.getPersons();
+	List<MedicalRecordsModel> listMedicalRecordsModel = repository.getMedicalRecords();
 
 	String firstKey = firstName;
 	String lastKey = lastName;
@@ -71,6 +67,7 @@ public class PersonInfoServiceImpl implements IPersonInfoService {
 			    personInfoModel.setMedications(medicalRecords.getMedications());
 			    personInfoModel.setAllergies(medicalRecords.getAllergies());
 			    listPersons.add(personInfoModel);
+
 			} catch (ParseException e) {
 			    e.printStackTrace();
 			}

@@ -32,4 +32,5 @@ public class FireStationsRepository {
 	}
 	return result.getFirestations();
     }
+    
 }

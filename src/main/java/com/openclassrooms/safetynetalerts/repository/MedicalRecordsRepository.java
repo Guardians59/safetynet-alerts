@@ -26,7 +26,7 @@ public class MedicalRecordsRepository {
 
 	    ObjectMapper mapper = new ObjectMapper();
 	    result = mapper.readValue(inputStream, DB.class);
-	    
+
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}

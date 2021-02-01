@@ -17,18 +17,14 @@ import org.springframework.stereotype.Repository;
 import com.openclassrooms.safetynetalerts.models.ChildAlertModel;
 import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
 import com.openclassrooms.safetynetalerts.models.PersonsModel;
-import com.openclassrooms.safetynetalerts.repository.MedicalRecordsRepository;
-import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
+import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IChildAlertService;
 
 @Repository
 public class ChildAlertServiceImpl implements IChildAlertService {
-
+    
     @Autowired
-    PersonsRepository personsRepository;
-
-    @Autowired
-    MedicalRecordsRepository medicalRecordsRepository;
+    DBRepository repository;
 
     private static final Logger logger = LogManager.getLogger("ChildAlertServiceImpl");
     private int personsAtTheAddress;
@@ -39,8 +35,8 @@ public class ChildAlertServiceImpl implements IChildAlertService {
 	HashMap<String, Object> result = new HashMap<>();
 	ArrayList<ChildAlertModel> listPersons = new ArrayList<>();
 	ArrayList<ChildAlertModel> listPersonsMinor = new ArrayList<>();
-	List<PersonsModel> listPersonsModel = personsRepository.findAll();
-	List<MedicalRecordsModel> listMedicalModel = medicalRecordsRepository.findAll();
+	List<PersonsModel> listPersonsModel = repository.getPersons();
+	List<MedicalRecordsModel> listMedicalModel = repository.getMedicalRecords();
 
 	String key = address;
 	Date dateNow = new Date();

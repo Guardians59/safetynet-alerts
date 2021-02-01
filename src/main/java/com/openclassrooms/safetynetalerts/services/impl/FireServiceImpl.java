@@ -18,22 +18,14 @@ import com.openclassrooms.safetynetalerts.models.FireModel;
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
 import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
 import com.openclassrooms.safetynetalerts.models.PersonsModel;
-import com.openclassrooms.safetynetalerts.repository.FireStationsRepository;
-import com.openclassrooms.safetynetalerts.repository.MedicalRecordsRepository;
-import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
+import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IFireService;
 
 @Repository
 public class FireServiceImpl implements IFireService {
 
     @Autowired
-    PersonsRepository personsRepository;
-
-    @Autowired
-    MedicalRecordsRepository medicalRecordsRepository;
-
-    @Autowired
-    FireStationsRepository fireStationsRepository;
+    DBRepository repository;
 
     private static final Logger logger = LogManager.getLogger("FireServiceIpml");
 
@@ -44,9 +36,9 @@ public class FireServiceImpl implements IFireService {
 	HashMap<String, Object> result = new HashMap<>();
 	ArrayList<FireModel> listPersons = new ArrayList<>();
 	ArrayList<Integer> stationNumber = new ArrayList<>();
-	List<PersonsModel> listPersonsModel = personsRepository.findAll();
-	List<MedicalRecordsModel> listMedicalModel = medicalRecordsRepository.findAll();
-	List<FireStationsModel> listFireStations = fireStationsRepository.findAll();
+	List<PersonsModel> listPersonsModel = repository.getPersons();
+	List<MedicalRecordsModel> listMedicalModel = repository.getMedicalRecords();
+	List<FireStationsModel> listFireStations = repository.getFireStations();
 	String key = address;
 	Date dateNow = new Date();
 

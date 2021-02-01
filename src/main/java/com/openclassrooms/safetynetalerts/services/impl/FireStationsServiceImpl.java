@@ -17,20 +17,14 @@ import org.springframework.stereotype.Repository;
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
 import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
 import com.openclassrooms.safetynetalerts.models.PersonsModel;
-import com.openclassrooms.safetynetalerts.repository.FireStationsRepository;
-import com.openclassrooms.safetynetalerts.repository.MedicalRecordsRepository;
-import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
+import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IFireStationsService;
 
 @Repository
 public class FireStationsServiceImpl implements IFireStationsService {
 
     @Autowired
-    FireStationsRepository fireStationsRepository;
-    @Autowired
-    PersonsRepository personsRepository;
-    @Autowired
-    MedicalRecordsRepository medicalRecordsRepository;
+    DBRepository repository;
 
     private static final Logger logger = LogManager.getLogger("FireStationsServieImpl");
     private int numberOfStationsFound;
@@ -40,7 +34,7 @@ public class FireStationsServiceImpl implements IFireStationsService {
     @Override
     public List<FireStationsModel> findAll() throws IOException {
 
-	return fireStationsRepository.findAll();
+	return repository.getFireStations();
     }
 
     @Override
@@ -50,9 +44,9 @@ public class FireStationsServiceImpl implements IFireStationsService {
 	ArrayList<PersonsModel> listPersons = new ArrayList<>();
 	ArrayList<PersonsModel> listPersonsMinor = new ArrayList<>();
 	ArrayList<PersonsModel> listPersonsMajor = new ArrayList<>();
-	List<FireStationsModel> listStationsModel = fireStationsRepository.findAll();
-	List<PersonsModel> listPersonsModel = personsRepository.findAll();
-	List<MedicalRecordsModel> listMedicalModel = medicalRecordsRepository.findAll();
+	List<FireStationsModel> listStationsModel = repository.getFireStations();
+	List<PersonsModel> listPersonsModel = repository.getPersons();
+	List<MedicalRecordsModel> listMedicalModel = repository.getMedicalRecords();
 	int key = station;
 	Date dateNow = new Date();
 	numberOfMajorPerson = 0;
@@ -124,6 +118,12 @@ public class FireStationsServiceImpl implements IFireStationsService {
 	}
 	return result;
 
+    }
+
+    public FireStationsModel saveFireStation(FireStationsModel fireStation) throws IOException {
+	repository.getFireStations().add(fireStation);
+	
+	return fireStation;
     }
 
 }

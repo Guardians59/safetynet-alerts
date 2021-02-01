@@ -11,14 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.openclassrooms.safetynetalerts.models.PersonsModel;
-import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
+import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.ICommunityEmailService;
 
 @Repository
 public class CommunityEmailServiceImpl implements ICommunityEmailService {
 
     @Autowired
-    PersonsRepository personsRepository;
+    DBRepository repository;
 
     private static final Logger logger = LogManager.getLogger("CommunityEmailServiceImpl");
 
@@ -27,7 +27,7 @@ public class CommunityEmailServiceImpl implements ICommunityEmailService {
 	HashMap<String, Object> result = new HashMap<>();
 	ArrayList<String> listEmail = new ArrayList<>();
 	ArrayList<PersonsModel> listPersonsFound = new ArrayList<>();
-	List<PersonsModel> list = personsRepository.findAll();
+	List<PersonsModel> list = repository.getPersons();
 
 	logger.info("Search for emails of people in the city of " + city);
 	list.forEach(person -> {

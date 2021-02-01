@@ -31,5 +31,4 @@ public class PersonsRepository {
 	}
 	return result.getPersons();
     }
-
 }
