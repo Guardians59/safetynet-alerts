@@ -1,14 +1,25 @@
 package com.openclassrooms.safetynetalerts.integration.controllers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import com.google.gson.Gson;
+import com.openclassrooms.safetynetalerts.models.FireStationsModel;
+import com.openclassrooms.safetynetalerts.models.PutFireStationsModel;
+import com.openclassrooms.safetynetalerts.services.impl.FireStationsServiceImpl;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -16,79 +27,194 @@ public class FireStationsControllerIT {
     
     @Autowired
     MockMvc mockMvc;
+    
+    @MockBean
+    FireStationsServiceImpl fireStationsServiceImpl;
+    
+    @Test
+    @DisplayName("Test de l'ajout d'une station")
+    public void addNewFireStationTest() throws Exception {
+	//GIVEN
+	FireStationsModel station = new FireStationsModel();
+	station.setAddress("24 haute rue");
+	station.setStation(6);
+	Gson gson = new Gson();
+	String json = gson.toJson(station);
+	
+	//WHEN
+	when(fireStationsServiceImpl.saveNewFireStation(station)).thenReturn(true);
+	
+	//THEN
+	mockMvc.perform(
+		MockMvcRequestBuilders.post("/firestation/add")
+			.content(json)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isCreated());
 
-    @Test
-    @DisplayName("Test que l'on reçoit les bonnes valeurs pour la station N°1")
-    public void getPersonsListByStationNumber1Test() throws Exception {
-	mockMvc.perform(get("/firestation?stationNumber=1"))
-		.andExpect(jsonPath("$.numberOfMinorPerson").value("1"))
-		.andExpect(jsonPath("$.numberOfMajorPerson").value("5"))
-	
-		.andExpect(jsonPath("$.personsMajor[0].firstName").value("Peter"))
-		.andExpect(jsonPath("$.personsMajor[0].lastName").value("Duncan"))
-		.andExpect(jsonPath("$.personsMajor[4].firstName").value("Shawna"))
-		.andExpect(jsonPath("$.personsMajor[4].lastName").value("Stelzer"))
-		.andExpect(jsonPath("$.personsMinor[0].firstName").value("Kendrik"))
-		.andExpect(jsonPath("$.personsMinor[0].lastName").value("Stelzer"));
-	
     }
     
     @Test
-    @DisplayName("Test que l'on reçoit les bonnes valeurs pour la station N°2")
-    public void getPersonsListByStationNumber2Test() throws Exception {
-	mockMvc.perform(get("/firestation?stationNumber=2"))
-		.andExpect(jsonPath("$.numberOfMinorPerson").value("1"))
-		.andExpect(jsonPath("$.numberOfMajorPerson").value("4"))
+    @DisplayName("Test no content lors de l'ajout d'une station")
+    public void addNewFireStationErrorTest() throws Exception {
+	//GIVEN
+	FireStationsModel station = new FireStationsModel();
+	station.setAddress("24 haute rue");
+	Gson gson = new Gson();
+	String json = gson.toJson(station);
 	
-		.andExpect(jsonPath("$.personsMajor[0].firstName").value("Jonanathan"))
-		.andExpect(jsonPath("$.personsMajor[0].lastName").value("Marrack"))
-		.andExpect(jsonPath("$.personsMajor[3].firstName").value("Eric"))
-		.andExpect(jsonPath("$.personsMajor[3].lastName").value("Cadigan"))
-		.andExpect(jsonPath("$.personsMinor[0].firstName").value("Zach"))
-		.andExpect(jsonPath("$.personsMinor[0].lastName").value("Zemicks"));
-	
+	//WHEN
+	when(fireStationsServiceImpl.saveNewFireStation(station)).thenReturn(false);
+
+	//THEN
+	mockMvc.perform(
+		MockMvcRequestBuilders.post("/firestation/add")
+			.content(json)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNoContent());
+
     }
     
     @Test
-    @DisplayName("Test que l'on reçoit les bonnes valeurs pour la station N°3")
-    public void getPersonsListByStationNumber3Test() throws Exception {
-	mockMvc.perform(get("/firestation?stationNumber=3"))
-		.andExpect(jsonPath("$.numberOfMinorPerson").value("3"))
-		.andExpect(jsonPath("$.numberOfMajorPerson").value("8"))
+    @DisplayName("Test no content lors de l'ajout d'une station déjà présente")
+    public void addFireStationErrorTest() throws Exception {
+	//GIVEN
+	FireStationsModel station = new FireStationsModel();
+	station.setAddress("892 Downing Ct");
+	station.setStation(2);
+	Gson gson = new Gson();
+	String json = gson.toJson(station);
 	
-		.andExpect(jsonPath("$.personsMajor[0].firstName").value("John"))
-		.andExpect(jsonPath("$.personsMajor[0].lastName").value("Boyd"))
-		.andExpect(jsonPath("$.personsMajor[7].firstName").value("Allison"))
-		.andExpect(jsonPath("$.personsMajor[7].lastName").value("Boyd"))
-		.andExpect(jsonPath("$.personsMinor[0].firstName").value("Tenley"))
-		.andExpect(jsonPath("$.personsMinor[0].lastName").value("Boyd"))
-		.andExpect(jsonPath("$.personsMinor[2].firstName").value("Tessa"))
-		.andExpect(jsonPath("$.personsMinor[2].lastName").value("Carman"));
-	
+	//WHEN
+	when(fireStationsServiceImpl.saveNewFireStation(station)).thenReturn(false);
+
+	//THEN
+	mockMvc.perform(
+		MockMvcRequestBuilders.post("/firestation/add")
+			.content(json)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNoContent());
+
     }
     
     @Test
-    @DisplayName("Test que l'on reçoit les bonnes valeurs pour la station N°4")
-    public void getPersonsListByStationNumber4Test() throws Exception {
-	mockMvc.perform(get("/firestation?stationNumber=4"))
-		.andExpect(jsonPath("$.numberOfMinorPerson").value("0"))
-		.andExpect(jsonPath("$.numberOfMajorPerson").value("4"))
+    @DisplayName("Test de la mis à jour d'une station")
+    public void updateFireStationTest() throws Exception {
+	//GIVEN
+	PutFireStationsModel fireStation = new PutFireStationsModel();
+	fireStation.setAddress("1509 Culver St");
+	fireStation.setNewStationNumber(6);
+	fireStation.setOldStationNumber(3);
+	Gson gson = new Gson();
+	String json = gson.toJson(fireStation);
 	
-		.andExpect(jsonPath("$.personsMajor[0].firstName").value("Lily"))
-		.andExpect(jsonPath("$.personsMajor[0].lastName").value("Cooper"))
-		.andExpect(jsonPath("$.personsMajor[3].firstName").value("Allison"))
-		.andExpect(jsonPath("$.personsMajor[3].lastName").value("Boyd"));
+	//WHEN
+	when(fireStationsServiceImpl.updateFireStation(fireStation)).thenReturn(true);
 	
+	//THEN
+	mockMvc.perform(MockMvcRequestBuilders.put("/firestation/update")
+			.content(json)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
     }
     
     @Test
-    @DisplayName("Test que l'on reçoit aucune réponse avec un numéro de station invalide")
-    public void getPersonsListByStationNumber5Test() throws Exception {
-	mockMvc.perform(get("/firestation?stationNumber=5"))
-		.andExpect(jsonPath("\"$.personsMajor").doesNotExist())
-		.andExpect(jsonPath("\"$.personsMinor").doesNotExist());
-		
+    @DisplayName("Test not found lors de la mis à jour d'une station")
+    public void updateFireStationErrorTest() throws Exception {
+	//GIVEN
+	PutFireStationsModel station = new PutFireStationsModel();
+	station.setAddress("951 LoneTree Rd false");
+	station.setOldStationNumber(2);
+	station.setNewStationNumber(5);
+	Gson gson = new Gson();
+	String json = gson.toJson(station);
 	
+	//WHEN
+	when(fireStationsServiceImpl.updateFireStation(station)).thenReturn(false);
+
+	//THEN
+	mockMvc.perform(
+		MockMvcRequestBuilders.put("/firestation/update")
+			.content(json)
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound());
+
+    }
+    
+    @Test
+    @DisplayName("Test de la suppression d'une station")
+    public void deleteFireStationTest() throws Exception {
+	//GIVEN
+	Optional<Integer> station = Optional.of(1);
+	Optional<String> address = Optional.of("644 Gershwin Cir") ;
+	String stationParam = "1";
+	String addressParam = "644 Gershwin Cir";
+	
+	//WHEN
+	when(fireStationsServiceImpl.deleteFireStation(station, address)).thenReturn(true);
+	
+	//THEN
+	mockMvc.perform(delete("/firestation/delete")
+		.param("station", stationParam)
+		.param("address", addressParam))
+		.andExpect(status().isOk());
+
+    }
+    
+    @Test
+    @DisplayName("Test de la suppression d'une adresse de station")
+    public void deleteFireStationAddressTest() throws Exception {
+	//GIVEN
+	Optional<Integer> station = Optional.empty();
+	Optional<String> address = Optional.of("489 Manchester St");
+	String addressParam = "489 Manchester St";
+	
+	//WHEN
+	when(fireStationsServiceImpl.deleteFireStation(station, address)).thenReturn(true);
+	
+	//THEN
+	mockMvc.perform(delete("/firestation/delete")
+		.param("address", addressParam))
+		.andExpect(status().isOk());
+
+    }
+    
+    @Test
+    @DisplayName("Test de la suppression d'une station par son numéro")
+    public void deleteFireStationNumberTest() throws Exception {
+	//GIVEN
+	Optional<Integer> station = Optional.of(1);
+	Optional<String> address = Optional.empty();
+	String stationParam = "1";
+	
+	//WHEN
+	when(fireStationsServiceImpl.deleteFireStation(station, address)).thenReturn(true);
+	
+	//THE
+	mockMvc.perform(delete("/firestation/delete")
+		.param("station", stationParam))
+		.andExpect(status().isOk());
+
+    }
+    
+    @Test
+    @DisplayName("Test not found lors de la suppression d'une station")
+    public void deleteFireStationErrorTest() throws Exception {
+	//GIVEN
+	Optional<Integer> station = Optional.of(4);
+	Optional<String> address = Optional.of("112 Steppes Pl false");
+	String stationParam = "4";
+	String addressParam = "112 Steppes Pl false";
+	
+	//WHEN
+	when(fireStationsServiceImpl.deleteFireStation(station, address)).thenReturn(false);
+	
+	//THEN
+	mockMvc.perform(delete("/firestation/delete")
+		.param("station", stationParam)
+		.param("address", addressParam))
+		.andExpect(status().isNotFound());
+
     }
 
 }
