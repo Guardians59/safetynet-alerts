@@ -1,35 +1,13 @@
 package com.openclassrooms.safetynetalerts;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.openclassrooms.safetynetalerts.models.FireStationsModel;
-import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
-import com.openclassrooms.safetynetalerts.models.PersonsModel;
-import com.openclassrooms.safetynetalerts.repository.FireStationsRepository;
-import com.openclassrooms.safetynetalerts.repository.MedicalRecordsRepository;
-import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
-
 @SpringBootApplication
-public class SafetynetAlertsApplication implements CommandLineRunner {
-    
-    @Autowired
-    FireStationsRepository fireStationsRepository;
-    @Autowired
-    PersonsRepository personsRepository;
-    @Autowired
-    MedicalRecordsRepository medicalRecordsRepository;
-    
-    public static List<FireStationsModel> stations;
-    public static List<PersonsModel> persons;
-    public static List<MedicalRecordsModel> medical;
+public class SafetynetAlertsApplication {
 
     public static void main(String[] args) {
 	SpringApplication.run(SafetynetAlertsApplication.class, args);
@@ -38,14 +16,6 @@ public class SafetynetAlertsApplication implements CommandLineRunner {
     @Bean
     protected HttpTraceRepository httpTraceRepository() {
 	return new InMemoryHttpTraceRepository();
-    }
-
-    @Override
-    public void run(String... args) throws Exception {
-	 stations = fireStationsRepository.findAll();
-	 persons = personsRepository.findAll();
-	 medical = medicalRecordsRepository.findAll();
-	
     }
 
 }

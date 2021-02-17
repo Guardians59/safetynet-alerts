@@ -7,7 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 class SafetynetAlertsApplicationTests {
 
     @Test
-    void contextLoads() {
+    public void contextLoads() {
+    }
+    
+    @Test
+    public void contextTest() {
+	SafetynetAlertsApplication.main(new String[] {});
     }
 
 }
