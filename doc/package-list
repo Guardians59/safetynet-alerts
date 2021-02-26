@@ -1,0 +1,8 @@
+com.openclassrooms.safetynetalerts
+com.openclassrooms.safetynetalerts.controllers
+com.openclassrooms.safetynetalerts.integration.controllers
+com.openclassrooms.safetynetalerts.models
+com.openclassrooms.safetynetalerts.repository
+com.openclassrooms.safetynetalerts.service
+com.openclassrooms.safetynetalerts.services
+com.openclassrooms.safetynetalerts.services.impl
