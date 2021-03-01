@@ -12,26 +12,34 @@ import com.openclassrooms.safetynetalerts.models.PersonsModel;
 import com.openclassrooms.safetynetalerts.repository.FireStationsRepository;
 import com.openclassrooms.safetynetalerts.repository.MedicalRecordsRepository;
 import com.openclassrooms.safetynetalerts.repository.PersonsRepository;
+
+/**
+ * La classe CommandLineRunDB permet la récupération des données externes lors
+ * du lancement du programme.
+ * 
+ * @author Dylan
+ *
+ */
 @Component
 public class CommandLineRunDB implements CommandLineRunner {
-    
+
     @Autowired
     FireStationsRepository fireStationsRepository;
     @Autowired
     PersonsRepository personsRepository;
     @Autowired
     MedicalRecordsRepository medicalRecordsRepository;
-    
+
     public static List<FireStationsModel> stations;
     public static List<PersonsModel> persons;
     public static List<MedicalRecordsModel> medical;
 
     @Override
     public void run(String... args) throws Exception {
-	 stations = fireStationsRepository.findAll();
-	 persons = personsRepository.findAll();
-	 medical = medicalRecordsRepository.findAll();
-	
+	stations = fireStationsRepository.findAll();
+	persons = personsRepository.findAll();
+	medical = medicalRecordsRepository.findAll();
+
     }
 
 }

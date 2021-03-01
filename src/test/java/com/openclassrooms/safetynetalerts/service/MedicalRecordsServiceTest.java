@@ -75,7 +75,7 @@ public class MedicalRecordsServiceTest {
 	medicalRecords.setAllergies(allergies);
 
 	//WHEN
-	medicalRecordsServiceImpl.addNewMedicalRecords(medicalRecords);
+	medicalRecordsServiceImpl.saveNewMedicalRecords(medicalRecords);
 	list = medicalRecordsServiceImpl.findAll();
 
 	//THEN
@@ -99,7 +99,7 @@ public class MedicalRecordsServiceTest {
 	int numberOfMedicalRecords = 0;
 
 	//WHEN
-	medicalRecordsServiceImpl.addNewMedicalRecords(medicalRecords);
+	medicalRecordsServiceImpl.saveNewMedicalRecords(medicalRecords);
 	list = medicalRecordsServiceImpl.findAll();
 	Iterator<MedicalRecordsModel> iterator = list.iterator();
 	while(iterator.hasNext()) {
@@ -130,7 +130,7 @@ public class MedicalRecordsServiceTest {
 	medicalRecords.setAllergies(allergies);
 
 	//WHEN
-	medicalRecordsServiceImpl.addNewMedicalRecords(medicalRecords);
+	medicalRecordsServiceImpl.saveNewMedicalRecords(medicalRecords);
 	list = medicalRecordsServiceImpl.findAll();
 
 	//THEN

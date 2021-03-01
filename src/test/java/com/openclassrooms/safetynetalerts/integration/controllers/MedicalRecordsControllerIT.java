@@ -48,7 +48,7 @@ public class MedicalRecordsControllerIT {
 	String json = gson.toJson(medicalRecord);
 	
 	//WHEN
-	when(medicalRecordsServiceImpl.addNewMedicalRecords(medicalRecord)).thenReturn(true);
+	when(medicalRecordsServiceImpl.saveNewMedicalRecords(medicalRecord)).thenReturn(true);
 
 	//THEN
 	mockMvc.perform(
@@ -74,7 +74,7 @@ public class MedicalRecordsControllerIT {
 	String json = gson.toJson(medicalRecord);
 	
 	//WHEN
-	when(medicalRecordsServiceImpl.addNewMedicalRecords(medicalRecord)).thenReturn(false);
+	when(medicalRecordsServiceImpl.saveNewMedicalRecords(medicalRecord)).thenReturn(false);
 	
 	//THEN
 	mockMvc.perform(
@@ -104,7 +104,7 @@ public class MedicalRecordsControllerIT {
 	String json = gson.toJson(medicalRecord);
 	
 	//WHEN
-	when(medicalRecordsServiceImpl.addNewMedicalRecords(medicalRecord)).thenReturn(false);
+	when(medicalRecordsServiceImpl.saveNewMedicalRecords(medicalRecord)).thenReturn(false);
 	
 	//THEN
 	mockMvc.perform(

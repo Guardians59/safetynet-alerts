@@ -12,7 +12,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
 import com.openclassrooms.safetynetalerts.models.PersonInfoModel;
@@ -20,13 +20,21 @@ import com.openclassrooms.safetynetalerts.models.PersonsModel;
 import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IPersonInfoService;
 
-@Repository
+/**
+ * La classe PersonInfoServiceImpl est l'implémentation de l'interface
+ * IPersonInfoService.
+ * 
+ * @see IPersonInfoService
+ * @author Dylan
+ *
+ */
+@Service
 public class PersonInfoServiceImpl implements IPersonInfoService {
 
     @Autowired
     DBRepository repository;
 
-    private static final Logger logger = LogManager.getLogger("PersonInfoServiceIpml");
+    private static Logger logger = LogManager.getLogger(PersonInfoServiceImpl.class);
 
     @Override
     public HashMap<String, Object> findPersonInfoByName(String firstName, String lastName)
@@ -36,13 +44,21 @@ public class PersonInfoServiceImpl implements IPersonInfoService {
 	ArrayList<PersonInfoModel> listPersons = new ArrayList<>();
 	List<PersonsModel> listPersonsModel = repository.getPersons();
 	List<MedicalRecordsModel> listMedicalRecordsModel = repository.getMedicalRecords();
-
 	String firstKey = firstName;
 	String lastKey = lastName;
 	Date dateNow = new Date();
 
-	logger.info("Search information about people with this name: " + firstKey + " " + lastKey);
+	logger.debug("Search information about people with this name: " + firstKey + " " + lastKey);
 
+	/**
+	 * Nous utilisons une boucle forEach dans la liste des personnes enregistrées
+	 * afin de retrouver celle correspondant aux paramètres, nous utilisons une
+	 * deuxième boucle dans les dossiers médicaux afin de récupérer ses informations
+	 * médicales et ajoutons toutes les donées de la personne dans une liste, ainsi
+	 * si nous avons plusieurs personnes portant le même nom, elle seront toutes
+	 * ajoutées. Nous renvoyons ensuite cette liste dans la hashmap envoyer en
+	 * résultat.
+	 */
 	listPersonsModel.forEach(person -> {
 	    if (person.getFirstName().equals(firstKey) && person.getLastName().equals(lastKey)) {
 		PersonInfoModel personInfoModel = new PersonInfoModel();
@@ -69,7 +85,7 @@ public class PersonInfoServiceImpl implements IPersonInfoService {
 			    listPersons.add(personInfoModel);
 
 			} catch (ParseException e) {
-			    e.printStackTrace();
+			    logger.error("Error when parsing birthdate", e);
 			}
 
 		    }
@@ -81,6 +97,7 @@ public class PersonInfoServiceImpl implements IPersonInfoService {
 	    logger.error("No person found with this name");
 	} else {
 	    result.put("personInfo", listPersons);
+	    logger.info("Informations of " + firstName + " " + lastName + " found");
 
 	}
 	return result;

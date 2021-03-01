@@ -26,7 +26,7 @@ public class PhoneAlertServiceTest {
 	boolean expected = true;
 
 	// WHEN
-	result = phoneAlertServiceImpl.findPhoneNumberPersonByTheStationNumber(1);
+	result = phoneAlertServiceImpl.findPhoneNumberPersonByTheStationNumber(2);
 
 	// THEN
 	assertEquals(result.containsKey("phoneNumbers"), expected);
@@ -40,7 +40,7 @@ public class PhoneAlertServiceTest {
 	boolean expected = false;
 
 	// WHEN
-	result = phoneAlertServiceImpl.findPhoneNumberPersonByTheStationNumber(5);
+	result = phoneAlertServiceImpl.findPhoneNumberPersonByTheStationNumber(16);
 
 	// THEN
 	assertEquals(result.containsKey("phoneNumbers"), expected);

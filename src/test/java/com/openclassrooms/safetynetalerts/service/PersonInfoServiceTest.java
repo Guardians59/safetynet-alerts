@@ -27,7 +27,7 @@ public class PersonInfoServiceTest {
 	boolean expected = true;
 
 	// WHEN
-	result = personInfoServiceImpl.findPersonInfoByName("John", "Boyd");
+	result = personInfoServiceImpl.findPersonInfoByName("Peter", "Duncan");
 
 	// THEN
 	assertEquals(result.containsKey("personInfo"), expected);

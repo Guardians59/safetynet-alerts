@@ -6,6 +6,13 @@ import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+/**
+ * La classe SafetynetAlertsApplication permet le déployement de l'application
+ * depuis un IDE.
+ * 
+ * @author Dylan
+ *
+ */
 @SpringBootApplication
 public class SafetynetAlertsApplication {
 

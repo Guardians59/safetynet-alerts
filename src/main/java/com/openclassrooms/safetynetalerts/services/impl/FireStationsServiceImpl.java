@@ -13,7 +13,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
 import com.openclassrooms.safetynetalerts.models.FireStationsPersonsModel;
@@ -23,13 +23,21 @@ import com.openclassrooms.safetynetalerts.models.PutFireStationsModel;
 import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IFireStationsService;
 
-@Repository
+/**
+ * La classe FireStationsServiceImpl est l'implémentation de l'interface
+ * IFireStationsService.
+ * 
+ * @see IFireStationsService
+ * @author Dylan
+ *
+ */
+@Service
 public class FireStationsServiceImpl implements IFireStationsService {
 
     @Autowired
     DBRepository repository;
 
-    private static final Logger logger = LogManager.getLogger("FireStationsServiceImpl");
+    private static Logger logger = LogManager.getLogger(FireStationsServiceImpl.class);
     private int numberOfStationsFound;
     private int numberOfMajorPerson;
     private int numberOfMinorPerson;
@@ -38,12 +46,15 @@ public class FireStationsServiceImpl implements IFireStationsService {
     public List<FireStationsModel> findAll() throws IOException {
 	List<FireStationsModel> listStations = repository.getFireStations();
 	ArrayList<FireStationsModel> result = new ArrayList<>();
+	numberOfStationsFound = 0;
+	logger.debug("Search the list of registered stations");
 	listStations.forEach(stationRegister -> {
 	    if (!result.contains(stationRegister)) {
 		result.add(stationRegister);
+		numberOfStationsFound++;
 	    }
 	});
-
+	logger.info(numberOfStationsFound + " stations found");
 	return result;
     }
 
@@ -63,7 +74,18 @@ public class FireStationsServiceImpl implements IFireStationsService {
 	numberOfMinorPerson = 0;
 	numberOfStationsFound = 0;
 
-	logger.info("Search for people covered by the station number " + key);
+	logger.debug("Search for people covered by the station number " + key);
+
+	/**
+	 * On utilise une boucle forEach pour vérifier si le numéro entrée en paramètre
+	 * correspond bien à une caserne enregistrée, si oui nous utilisons une autre
+	 * boucle pour rechercher les personnes qui ont la même adresse que celles
+	 * couvertes par la caserne, ensuite nous utilisons une dernière boucle dans les
+	 * dossiers médicaux afin de récupérer la date de naissance des personnes pour
+	 * calculer leurs âges et ainsi trier les personnes selon si ils sont mineurs ou
+	 * majeurs pour afficher un décompte. Enfin on retourne les différentes listes,
+	 * personsMinor et personsMajor avec les décomptes dans une hashmap.
+	 */
 	listStationsModel.forEach(fireStation -> {
 	    if (fireStation.getStation() == key) {
 		numberOfStationsFound++;
@@ -100,7 +122,7 @@ public class FireStationsServiceImpl implements IFireStationsService {
 					listPersonsMinor.add(fireStationsPersonsModel);
 				    }
 				} catch (ParseException e) {
-				    e.printStackTrace();
+				    logger.error("Error when parsing birthdate", e);
 				}
 
 			    }
@@ -132,15 +154,25 @@ public class FireStationsServiceImpl implements IFireStationsService {
 	if (numberOfStationsFound != 0) {
 	    result.put("numberOfMajorPerson", numberOfMajorPerson);
 	    result.put("numberOfMinorPerson", numberOfMinorPerson);
+	    logger.info(numberOfMinorPerson + " person(s) minor and " + numberOfMajorPerson
+		    + " person(s) major found in the coverage area of station number " + key);
 	}
 	return result;
 
     }
 
+    @Override
     public boolean saveNewFireStation(FireStationsModel fireStation) throws IOException {
 
 	List<FireStationsModel> list = repository.getFireStations();
 	boolean result = false;
+
+	/**
+	 * Si les infos de la station sont valides nous vérifions si elle n'est pas déjà
+	 * présente dans la liste, auquel cas nous l'ajoutons et indiquons true au
+	 * boolean qui sera renvoyer, sinon nous laissons le boolean sur false pour
+	 * indiquer que l'ajout n'est pas validé.
+	 */
 	if (fireStation.getStation() > 0 && fireStation.getAddress() != null) {
 	    logger.debug("Adding the new station");
 
@@ -161,13 +193,24 @@ public class FireStationsServiceImpl implements IFireStationsService {
 	return result;
     }
 
+    @Override
     public boolean updateFireStation(PutFireStationsModel fireStation) throws IOException {
 	List<FireStationsModel> list = repository.getFireStations();
 	numberOfStationsFound = 0;
 	boolean result = false;
 
+	/**
+	 * Nous vérifions que les infos de la station sont corrects, ensuite nous
+	 * utilisons une boucle forEach afin de trouver la station en question avec
+	 * l'adresse et son numéro à modifier, si nous trouvons un résultat nous
+	 * modifions son numéro par le nouveau et indiquons true au boolean afin de
+	 * confirmer la mis à jour, sinon le boolean reste sur false pour indiquer que
+	 * la mis à jour n'est pas validée.
+	 */
 	if (fireStation.getAddress() != null && fireStation.getOldStationNumber() > 0
 		&& fireStation.getNewStationNumber() > 0) {
+
+	    logger.debug("Updating the station");
 
 	    list.forEach(stationRegister -> {
 		if (stationRegister.getAddress().equals(fireStation.getAddress())
@@ -179,7 +222,9 @@ public class FireStationsServiceImpl implements IFireStationsService {
 	    if (numberOfStationsFound == 0) {
 		logger.error("No station corresponds with the indicated address " + fireStation.getAddress());
 	    } else if (numberOfStationsFound == 1) {
-		logger.info("The station covering the address " + fireStation.getAddress() + " update validated");
+		logger.info("Update validated the address " + fireStation.getAddress()
+			+ " is now covered by the station number " + fireStation.getNewStationNumber()
+			+ " instead of the station number " + fireStation.getOldStationNumber());
 		result = true;
 	    } else {
 		logger.error("Error encountered while updating the station");
@@ -190,16 +235,27 @@ public class FireStationsServiceImpl implements IFireStationsService {
 	return result;
     }
 
-    public boolean deleteFireStation(Optional<Integer> station, Optional<String> address)
-	    throws IOException {
+    @Override
+    public boolean deleteFireStation(Optional<Integer> station, Optional<String> address) throws IOException {
 	List<FireStationsModel> list = repository.getFireStations();
 	List<FireStationsModel> deleteList = new ArrayList<>();
-	
 	numberOfStationsFound = 0;
 	boolean result = false;
 
+	// Nous vérifions qu'au moins un paramètre est présent et qu'il est valide.
 	if (station.isPresent() && station.get() > 0 || address.isPresent() && address.get() != null) {
+
+	    /**
+	     * Si les deux paramètres sont présents, nous utilisons une boucle forEach afin
+	     * de retrouver la station qui correspond aux informations indiquées pour la
+	     * supprimer, nous vérifions ensuite qu'elle n'est plus présente dans la liste,
+	     * si tel est le cas nous indiquons true au boolean pour confirmer la
+	     * suppression, sinon nous laissons false afin d'indiquer que la suppression ne
+	     * s'est pas executée.
+	     */
 	    if (station.isPresent() && address.isPresent()) {
+		logger.debug("Deleting the station with the address " + address.get() + " the station number "
+			+ station.get());
 		FireStationsModel fireStationModel = new FireStationsModel();
 		list.forEach(stationRegister -> {
 
@@ -225,7 +281,19 @@ public class FireStationsServiceImpl implements IFireStationsService {
 		} else {
 		    logger.error("Error encountered while deleting the station");
 		}
-	    } else if (station.isPresent() && !address.isPresent()) {
+	    }
+
+	    /**
+	     * Si seul le numéro de caserne est présent, nous utilisons une boucle forEach
+	     * afin de retrouver les adresses couvertes par celle-ci, à chaque résultat nous
+	     * l'ajoutons à la liste deleteList, nous supprimons ensuite toute les adresses
+	     * de celle-ci contenu dans la liste de données, nous vérifions que la caserne à
+	     * bien été supprimée afin d'indiquer true au boolean pour valider la
+	     * suppression, sinon nous laissons false afin d'indiquer que la suppression ne
+	     * s'est pas executée.
+	     */
+	    else if (station.isPresent() && !address.isPresent()) {
+		logger.debug("Deleting the station with number " + station.get());
 		list.forEach(stationRegister -> {
 
 		    if (stationRegister.getStation() == station.get()) {
@@ -236,7 +304,7 @@ public class FireStationsServiceImpl implements IFireStationsService {
 			numberOfStationsFound++;
 		    }
 		});
-		
+
 		if (list.containsAll(deleteList)) {
 		    list.removeAll(deleteList);
 		}
@@ -249,7 +317,19 @@ public class FireStationsServiceImpl implements IFireStationsService {
 		    logger.error("Error encountered while deleting the station");
 		}
 
-	    } else if (address.isPresent() && !station.isPresent()) {
+	    }
+
+	    /**
+	     * Si seul l'adresse est présente nous utilisons une boucle forEach afin de
+	     * trouver toutes les casernes couvrant cette adresse, à chaque résultat nous
+	     * l'ajoutons à la liste deleList, nous supprimons ensuite tous les mapping des
+	     * casernes de cette liste contenu dans la liste de données, nous vérifions que
+	     * l'adresse n'est plus présente dans la liste de données pour indiquer true au
+	     * boolean afin de valider la suppression, sinon nous laissons false au boolean
+	     * pour indiquer que la suppression ne s'est pas executée.
+	     */
+	    else if (address.isPresent() && !station.isPresent()) {
+		logger.debug("Deleting the address " + address.get() + " of addresses covered by the stations");
 		list.forEach(stationRegister -> {
 
 		    if (stationRegister.getAddress().equals(address.get())) {

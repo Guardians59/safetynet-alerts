@@ -30,6 +30,7 @@ public class FloodServiceTest {
 	List<Integer> stationNumber = new ArrayList<>();
 	stationNumber.add(1);
 	stationNumber.add(2);
+	stationNumber.add(3);
 	
 	//WHEN
 	result = floodServiceImpl.findHomesServedByTheStation(stationNumber);
@@ -46,7 +47,7 @@ public class FloodServiceTest {
 	HashMap<String, Object> result = new HashMap<>();
 	boolean expected = true;
 	List<Integer> stationNumber = new ArrayList<>();
-	stationNumber.add(5);
+	stationNumber.add(15);
 	stationNumber.add(3);
 	
 	//WHEN
@@ -65,7 +66,7 @@ public class FloodServiceTest {
 	HashMap<String, Object> result = new HashMap<>();
 	boolean expected = false;
 	List<Integer> stationNumber = new ArrayList<>();
-	stationNumber.add(5);
+	stationNumber.add(18);
 	
 	//WHEN
 	result = floodServiceImpl.findHomesServedByTheStation(stationNumber);

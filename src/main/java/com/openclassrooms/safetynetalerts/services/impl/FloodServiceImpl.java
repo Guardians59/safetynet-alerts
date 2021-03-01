@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import com.openclassrooms.safetynetalerts.models.FloodAddressModel;
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
@@ -23,15 +22,23 @@ import com.openclassrooms.safetynetalerts.models.PersonsModel;
 import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IFloodService;
 
-@Repository
+/**
+ * La classe FloodServiceImpl est l'implémentation de l'interface IFloodService.
+ * 
+ * @see IFloodService
+ * @author Dylan
+ *
+ */
+@Service
 public class FloodServiceImpl implements IFloodService {
 
     @Autowired
     DBRepository repository;
 
-    private static final Logger logger = LogManager.getLogger("FloodServiceIpml");
+    private static Logger logger = LogManager.getLogger(FloodServiceImpl.class);
     private int key;
     private int numberOfStationsFound;
+    private int homesNumber;
     private boolean stationFound;
 
     @Override
@@ -43,11 +50,26 @@ public class FloodServiceImpl implements IFloodService {
 	List<FireStationsModel> listStationsModel = repository.getFireStations();
 	List<PersonsModel> listPersonsModel = repository.getPersons();
 	List<MedicalRecordsModel> listMedicalRecordsModel = repository.getMedicalRecords();
-
 	key = 0;
 	stationFound = false;
+	homesNumber = 0;
 	Date dateNow = new Date();
 
+	/**
+	 * Nous utilisons une boucle forEach pour la liste des casernes entrées en
+	 * paramètre, à chaque numéro nous initions une autre boucle dans la liste des
+	 * casernes enregistrées pour vérifier qu'une caserne corresponde bien au numéro
+	 * indiquée, nous récupérons l'adresse couverte par celle-ci et initions une
+	 * troisième boucle dans la liste des personnes afin de trouver les personnes
+	 * vivant à cette adresse, nous utilisons une dernière boucle afin de récupérer
+	 * les dossiers médicaux de ces personnes et ajoutons ces résultats dans une
+	 * liste. Chaque listAddressModel correspond à un foyer avec toutes les
+	 * personnes comprenant leurs informations y vivant. Chaque
+	 * listFloodStationModel correspond à la liste de tous les foyers couvert par la
+	 * caserne. Nous renvoyons donc le résultat dans une hashmap où chaque station à
+	 * son numéro et la liste de tous les foyers et personnes couvertes
+	 * correspondante.
+	 */
 	station.forEach(stationNumber -> {
 	    key = stationNumber.intValue();
 	    numberOfStationsFound = 0;
@@ -55,7 +77,7 @@ public class FloodServiceImpl implements IFloodService {
 	    ArrayList<FloodAddressModel> listAddressModel = new ArrayList<>();
 	    ArrayList<PersonsModel> listPersonsCheckDuplicate = new ArrayList<>();
 
-	    logger.info("Search homes served by the station number " + key);
+	    logger.debug("Search homes served by the station number " + key);
 	    listStationsModel.forEach(fireStation -> {
 		if (fireStation.getStation() == key) {
 
@@ -94,7 +116,7 @@ public class FloodServiceImpl implements IFloodService {
 					listFloodPersonModel.add(personInfosFloodModel);
 
 				    } catch (ParseException e) {
-					e.printStackTrace();
+					logger.error("Error when parsing birthdate", e);
 				    }
 
 				}
@@ -106,6 +128,7 @@ public class FloodServiceImpl implements IFloodService {
 		    addressModel.setListPersonsInHome(listFloodPersonModel);
 		    if (!addressModel.getListPersonsInHome().isEmpty()) {
 			listAddressModel.add(addressModel);
+			homesNumber++;
 		    }
 		}
 
@@ -126,6 +149,7 @@ public class FloodServiceImpl implements IFloodService {
 
 	if (stationFound == true && !listFloodStationModel.get(0).getListHomes().isEmpty()) {
 	    result.put("stations", listFloodStationModel);
+	    logger.info(homesNumber + " homes covered found");
 	}
 	return result;
     }

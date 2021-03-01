@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import com.openclassrooms.safetynetalerts.models.FireModel;
 import com.openclassrooms.safetynetalerts.models.FireStationsModel;
@@ -21,13 +20,21 @@ import com.openclassrooms.safetynetalerts.models.PersonsModel;
 import com.openclassrooms.safetynetalerts.repository.DBRepository;
 import com.openclassrooms.safetynetalerts.services.IFireService;
 
-@Repository
+/**
+ * La classe FireServiceImpl est l'implémentation de l'interface IFireService.
+ * 
+ * @see IFireService
+ * @author Dylan
+ *
+ */
+@Service
 public class FireServiceImpl implements IFireService {
 
     @Autowired
     DBRepository repository;
 
-    private static final Logger logger = LogManager.getLogger("FireServiceIpml");
+    private static Logger logger = LogManager.getLogger(FireServiceImpl.class);
+    private int numberOfPersons;
 
     @Override
     public HashMap<String, Object> findPersonsAndFireStationAtTheAddress(String address)
@@ -41,13 +48,24 @@ public class FireServiceImpl implements IFireService {
 	List<FireStationsModel> listFireStations = repository.getFireStations();
 	String key = address;
 	Date dateNow = new Date();
+	numberOfPersons = 0;
 
-	logger.info("Search the persons living at this address " + key);
+	logger.debug("Search the persons living at this address " + key);
+
+	/**
+	 * On vérifie avec une boucle forEach si une personne à la même adresse que
+	 * celle indiquée en paramètre, si tel est le cas on utilise une autre boucle
+	 * pour récupérer le dossier médical de la personne et calculer son âge, pour
+	 * ajouter ensuite cette personne à la liste. On vérifie avec une boucle quelle
+	 * station intervient à cette adresse. On renvoit les résultats dans une
+	 * hashmap.
+	 */
 	listPersonsModel.forEach(person -> {
 	    if (person.getAddress().equals(key)) {
 		FireModel infosPerson = new FireModel();
 		infosPerson.setLastName(person.getLastName());
 		infosPerson.setPhoneNumber(person.getPhone());
+		numberOfPersons++;
 
 		listMedicalModel.forEach(medicalInfosPerson -> {
 		    if (medicalInfosPerson.getFirstName().equals(person.getFirstName())
@@ -68,13 +86,13 @@ public class FireServiceImpl implements IFireService {
 			    listPersons.add(infosPerson);
 
 			} catch (ParseException e) {
-			    e.printStackTrace();
+			    logger.error("Error when parsing birthdate", e);
 			}
 		    }
 		});
 	    }
 	});
-	logger.info("Search the station number serving this address");
+	logger.debug("Search the station number serving this address");
 	listFireStations.forEach(station -> {
 	    if (station.getAddress().equals(key)) {
 		int number = station.getStation();
@@ -89,6 +107,8 @@ public class FireServiceImpl implements IFireService {
 	} else {
 	    result.put("persons", listPersons);
 	    result.put("stationNumber", stationNumber);
+	    logger.info(numberOfPersons + " persons found at this address " + key
+		    + " which is covered by the station number " + stationNumber.toString());
 	}
 	return result;
     }
