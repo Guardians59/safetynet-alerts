@@ -22,7 +22,7 @@ public class PhoneAlertControllerIT {
     public void getPhoneNumbersPersonsByStationNumber1Test() throws Exception {
 	mockMvc.perform(get("/phoneAlert?firestation=1"))
 		.andExpect(jsonPath("$.phoneNumbers[0]").value("841-874-6512"))
-		.andExpect(jsonPath("$.phoneNumbers[5]").value("841-874-7784"));
+		.andExpect(jsonPath("$.phoneNumbers[3]").value("841-874-7784"));
 	
     }
     
@@ -31,7 +31,7 @@ public class PhoneAlertControllerIT {
     public void getPhoneNumbersPersonsByStationNumber3Test() throws Exception {
 	mockMvc.perform(get("/phoneAlert?firestation=3"))
 		.andExpect(jsonPath("$.phoneNumbers[0]").value("841-874-6512"))
-		.andExpect(jsonPath("$.phoneNumbers[10]").value("841-874-9888"));
+		.andExpect(jsonPath("$.phoneNumbers[6]").value("841-874-9888"));
 	
     }
     

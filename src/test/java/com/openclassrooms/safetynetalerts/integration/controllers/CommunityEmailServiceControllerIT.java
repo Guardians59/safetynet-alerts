@@ -22,7 +22,7 @@ public class CommunityEmailServiceControllerIT {
     public void getEmailPersonsInTheCityTest() throws Exception {
 	mockMvc.perform(get("/communityEmail?city=Culver"))
 		.andExpect(jsonPath("$.email[0]").value("jaboyd@email.com"))
-		.andExpect(jsonPath("$.email[22]").value("gramps@email.com"));
+		.andExpect(jsonPath("$.email[14]").value("gramps@email.com"));
     }
     
     @Test
