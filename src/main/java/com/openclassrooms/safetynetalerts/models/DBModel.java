@@ -2,7 +2,7 @@ package com.openclassrooms.safetynetalerts.models;
 
 import java.util.List;
 
-public class DB {
+public class DBModel {
 
     private List<PersonsModel> persons;
     private List<FireStationsModel> firestations;

@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassrooms.safetynetalerts.models.DB;
+import com.openclassrooms.safetynetalerts.models.DBModel;
 import com.openclassrooms.safetynetalerts.models.MedicalRecordsModel;
 
 /**
@@ -36,7 +36,7 @@ public class MedicalRecordsRepository {
      *                     d'entrée de données.
      */
     public List<MedicalRecordsModel> findAll() throws IOException {
-	DB result = null;
+	DBModel result = null;
 	try {
 	    URL url = new URL(
 		    "https://s3-eu-west-1.amazonaws.com/course.oc-static.com/projects/DA+Java+EN/P5+/data.json");
@@ -45,7 +45,7 @@ public class MedicalRecordsRepository {
 	    InputStream inputStream = connection.getInputStream();
 
 	    ObjectMapper mapper = new ObjectMapper();
-	    result = mapper.readValue(inputStream, DB.class);
+	    result = mapper.readValue(inputStream, DBModel.class);
 
 	} catch (IOException e) {
 	    logger.error("Error when reading json file", e);
